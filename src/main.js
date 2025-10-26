@@ -1,4 +1,4 @@
-import getImagesByQuery from './js/pixabay-api';
+import getImagesByQuery from './js/pixabay-api.js';
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 
@@ -8,10 +8,11 @@ import {
   showLoader,
   hideLoader,
   lightbox,
-} from './js/render-functions';
+} from './js/render-functions.js';
 
 const form = document.querySelector('.form');
 const input = form.elements['search-text'];
+let page = 1;
 
 form.addEventListener('submit', async ev => {
   ev.preventDefault();
@@ -30,10 +31,13 @@ form.addEventListener('submit', async ev => {
   showLoader();
 
   try {
-    const data = await getImagesByQuery(query);
+    const data = await getImagesByQuery(query, page);
+    //Error
     if (!data || !Array.isArray(data.hits)) {
       throw new Error('Bad response shape from API');
     }
+
+    //No results
     if (data.hits.length === 0) {
       iziToast.warning({
         title: 'Warning',
@@ -42,6 +46,8 @@ form.addEventListener('submit', async ev => {
       });
       return;
     }
+
+    //Data recived
     createGallery(data.hits);
   } catch (err) {
     console.error(err);
@@ -51,6 +57,16 @@ form.addEventListener('submit', async ev => {
     });
   } finally {
     hideLoader();
-    input.value = '';
+    // input.value = '';
   }
 });
+
+async function loadMore() {
+  const query = input.value.trim();
+  page++;
+  try {
+    const data = await getImagesByQuery(query, page);
+  } catch (error) {
+  } finally {
+  }
+}

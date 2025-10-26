@@ -3,6 +3,8 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const galleryEl = document.querySelector('.gallery');
 const loaderEl = document.querySelector('.loader');
+// Ensure loader is hidden by default to match CSS utility class
+if (loaderEl) loaderEl.classList.add('hidden');
 
 const lightbox = new SimpleLightbox('.gallery a', {
   captionsData: 'alt',
@@ -46,12 +48,12 @@ function clearGallery() {
 
 function showLoader() {
   if (!loaderEl) return;
-  loaderEl.classList.add('is-visible');
+  loaderEl.classList.remove('hidden');
 }
 
 function hideLoader() {
   if (!loaderEl) return;
-  loaderEl.classList.remove('is-visible');
+  loaderEl.classList.add('hidden');
 }
 
 export { createGallery, clearGallery, showLoader, hideLoader, lightbox };
