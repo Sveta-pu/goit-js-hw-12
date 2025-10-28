@@ -11,7 +11,7 @@
     max-width: 768px;
   }
 }
-/* Styles for Desktop devices */
+
 @media only screen and (min-width: 1200px) {
   .container {
     max-width: 1200px;
@@ -45,7 +45,6 @@
   display: block;
 }
 
-/* Тепер блок info — під фото, не поверх */
 .info {
   display: flex;
   justify-content: space-around;

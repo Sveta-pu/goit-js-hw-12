@@ -3,7 +3,8 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const galleryEl = document.querySelector('.gallery');
 const loaderEl = document.querySelector('.loader');
-// Ensure loader is hidden by default to match CSS utility class
+const loadMoreButton = document.querySelector('.load_more_button');
+
 if (loaderEl) loaderEl.classList.add('hidden');
 
 const lightbox = new SimpleLightbox('.gallery a', {
@@ -56,4 +57,22 @@ function hideLoader() {
   loaderEl.classList.add('hidden');
 }
 
-export { createGallery, clearGallery, showLoader, hideLoader, lightbox };
+function showLoadMoreButton() {
+  if (!loadMoreButton) return;
+  loadMoreButton.classList.remove('hidden');
+}
+
+function hideLoadMoreButton() {
+  if (!loadMoreButton) return;
+  loadMoreButton.classList.add('hidden');
+}
+
+export {
+  createGallery,
+  clearGallery,
+  showLoader,
+  hideLoader,
+  showLoadMoreButton,
+  hideLoadMoreButton,
+  lightbox,
+};

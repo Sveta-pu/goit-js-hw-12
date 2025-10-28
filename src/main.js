@@ -1,4 +1,4 @@
-import getImagesByQuery from './js/pixabay-api.js';
+import { getImagesByQuery } from './js/pixabay-api';
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 
@@ -8,15 +8,20 @@ import {
   showLoader,
   hideLoader,
   lightbox,
+  showLoadMoreButton,
+  hideLoadMoreButton,
 } from './js/render-functions.js';
 
 const form = document.querySelector('.form');
 const input = form.elements['search-text'];
 let page = 1;
 
+const loadMoreBtn = document.querySelector('.load_more_button');
+loadMoreBtn.addEventListener('click', loadMore);
+
 form.addEventListener('submit', async ev => {
   ev.preventDefault();
-
+  page = 1;
   const query = input.value.trim();
   if (!query) {
     iziToast.warning({
@@ -32,12 +37,11 @@ form.addEventListener('submit', async ev => {
 
   try {
     const data = await getImagesByQuery(query, page);
-    //Error
+
     if (!data || !Array.isArray(data.hits)) {
       throw new Error('Bad response shape from API');
     }
 
-    //No results
     if (data.hits.length === 0) {
       iziToast.warning({
         title: 'Warning',
@@ -47,8 +51,8 @@ form.addEventListener('submit', async ev => {
       return;
     }
 
-    //Data recived
     createGallery(data.hits);
+    showLoadMoreButton();
   } catch (err) {
     console.error(err);
     iziToast.error({
@@ -57,16 +61,41 @@ form.addEventListener('submit', async ev => {
     });
   } finally {
     hideLoader();
-    // input.value = '';
   }
 });
 
 async function loadMore() {
   const query = input.value.trim();
-  page++;
+  page = +1;
   try {
     const data = await getImagesByQuery(query, page);
+    createGallery(data.hits);
+    const shownImsges = data.hits.length;
+    const totalImages = data.totalHits;
+    if (shownImsges >= totalImages) {
+      showLoadMoreButton();
+    } else {
+      hideLoadMoreButton();
+      iziToast.info({
+        title: 'End',
+        message: "We're sorry, but you've reached the end of search results.",
+      });
+    }
+    lightbox.refresh();
   } catch (error) {
   } finally {
+    hideLoader();
   }
 }
+
+function smoothScrollByCardHeight() {
+  const firstCard = document.querySelector('.gallery .photo-card');
+  if (!firstCard) return;
+  const { height } = firstCard.getBoundingClientRect();
+  window.scrollBy({
+    top: height * 2,
+    left: 0,
+    behavior: 'smooth',
+  });
+}
+smoothScrollByCardHeight();

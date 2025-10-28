@@ -95,6 +95,15 @@ body {
   padding: 0;
 }
 
+.load_more_button {
+  display: block;
+  margin: 40px auto;
+  width: 150px;
+  height: 45px;
+  text-align: center;
+  cursor: pointer;
+}
+
 .form__button:hover,
 .form__button:focus {
   background-color: #6c8cff;
