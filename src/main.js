@@ -85,6 +85,7 @@ async function loadMore() {
   } catch (error) {
   } finally {
     hideLoader();
+    input.value = '';
   }
 }
 
