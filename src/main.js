@@ -14,14 +14,21 @@ import {
 
 const form = document.querySelector('.form');
 const input = form.elements['search-text'];
-let page = 1;
-
 const loadMoreBtn = document.querySelector('.load_more_button');
-loadMoreBtn.addEventListener('click', loadMore);
 
-form.addEventListener('submit', async ev => {
+let page = 1;
+let currentQuery = '';
+let shownImages = 0;
+let totalImages = 0;
+let isLoading = false;
+
+loadMoreBtn.addEventListener('click', loadMore);
+form.addEventListener('submit', onSearch);
+
+async function onSearch(ev) {
   ev.preventDefault();
-  page = 1;
+  if (isLoading) return;
+
   const query = input.value.trim();
   if (!query) {
     iziToast.warning({
@@ -31,12 +38,18 @@ form.addEventListener('submit', async ev => {
     return;
   }
 
-  clearGallery();
+  page = 1;
+  currentQuery = query;
+  shownImages = 0;
+  totalImages = 0;
 
+  clearGallery();
+  hideLoadMoreButton();
   showLoader();
+  isLoading = true;
 
   try {
-    const data = await getImagesByQuery(query, page);
+    const data = await getImagesByQuery(currentQuery, page);
 
     if (!data || !Array.isArray(data.hits)) {
       throw new Error('Bad response shape from API');
@@ -52,7 +65,19 @@ form.addEventListener('submit', async ev => {
     }
 
     createGallery(data.hits);
-    showLoadMoreButton();
+    lightbox.refresh();
+
+    shownImages = data.hits.length;
+    totalImages = Number(data.totalHits) || 0;
+
+    if (shownImages <= totalImages) {
+      showLoadMoreButton();
+    } else {
+      hideLoadMoreButton();
+      iziToast.info({ title: 'End', message: "That's all for this query." });
+    }
+
+    smoothScrollByCardHeight();
   } catch (err) {
     console.error(err);
     iziToast.error({
@@ -61,31 +86,60 @@ form.addEventListener('submit', async ev => {
     });
   } finally {
     hideLoader();
+    isLoading = false;
   }
-});
+}
 
 async function loadMore() {
-  const query = input.value.trim();
-  page = +1;
+  if (isLoading) return;
+  isLoading = true;
+  page += 1;
+  hideLoadMoreButton();
+  loadMoreBtn.disabled = true;
+  showLoader();
+
   try {
-    const data = await getImagesByQuery(query, page);
-    createGallery(data.hits);
-    const shownImsges = data.hits.length;
-    const totalImages = data.totalHits;
-    if (shownImsges >= totalImages) {
-      showLoadMoreButton();
-    } else {
+    const data = await getImagesByQuery(currentQuery, page);
+
+    if (!data || !Array.isArray(data.hits)) {
+      throw new Error('Bad response shape from API (loadMore)');
+    }
+
+    if (data.hits.length === 0) {
       hideLoadMoreButton();
       iziToast.info({
         title: 'End',
         message: "We're sorry, but you've reached the end of search results.",
       });
+      return;
     }
+
+    createGallery(data.hits);
     lightbox.refresh();
-  } catch (error) {
+
+    shownImages += data.hits.length;
+
+    if (shownImages >= totalImages) {
+      hideLoadMoreButton();
+      iziToast.info({
+        title: 'End',
+        message: "We're sorry, but you've reached the end of search results.",
+      });
+    } else {
+      showLoadMoreButton();
+    }
+
+    smoothScrollByCardHeight();
+  } catch (err) {
+    console.error(err);
+    iziToast.error({
+      title: 'Error',
+      message: 'Network error or API failed. Try again later.',
+    });
   } finally {
     hideLoader();
-    input.value = '';
+    loadMoreBtn.disabled = false;
+    isLoading = false;
   }
 }
 
@@ -93,10 +147,5 @@ function smoothScrollByCardHeight() {
   const firstCard = document.querySelector('.gallery .photo-card');
   if (!firstCard) return;
   const { height } = firstCard.getBoundingClientRect();
-  window.scrollBy({
-    top: height * 2,
-    left: 0,
-    behavior: 'smooth',
-  });
+  window.scrollBy({ top: height * 2, left: 0, behavior: 'smooth' });
 }
-smoothScrollByCardHeight();

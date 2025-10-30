@@ -167,3 +167,6 @@ body {
 .gallery__item:hover .image__info {
   transform: translateY(0);
 }
+.hidden {
+  display: none;
+}
