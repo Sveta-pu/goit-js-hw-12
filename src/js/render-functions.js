@@ -74,5 +74,4 @@ export {
   hideLoader,
   showLoadMoreButton,
   hideLoadMoreButton,
-  lightbox,
 };

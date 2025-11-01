@@ -7,7 +7,6 @@ import {
   clearGallery,
   showLoader,
   hideLoader,
-  lightbox,
   showLoadMoreButton,
   hideLoadMoreButton,
 } from './js/render-functions.js';
@@ -65,12 +64,11 @@ async function onSearch(ev) {
     }
 
     createGallery(data.hits);
-    lightbox.refresh();
 
     shownImages = data.hits.length;
     totalImages = Number(data.totalHits) || 0;
 
-    if (shownImages <= totalImages) {
+    if (shownImages < totalImages) {
       showLoadMoreButton();
     } else {
       hideLoadMoreButton();
@@ -115,7 +113,6 @@ async function loadMore() {
     }
 
     createGallery(data.hits);
-    lightbox.refresh();
 
     shownImages += data.hits.length;
 
@@ -144,8 +141,8 @@ async function loadMore() {
 }
 
 function smoothScrollByCardHeight() {
-  const firstCard = document.querySelector('.gallery .photo-card');
+  const firstCard = document.querySelector('.gallery .photo-item');
   if (!firstCard) return;
   const { height } = firstCard.getBoundingClientRect();
-  window.scrollBy({ top: height * 2, left: 0, behavior: 'smooth' });
+  window.scrollBy({ top: height, left: 0, behavior: 'smooth' });
 }
