@@ -144,5 +144,5 @@ function smoothScrollByCardHeight() {
   const firstCard = document.querySelector('.gallery .photo-item');
   if (!firstCard) return;
   const { height } = firstCard.getBoundingClientRect();
-  window.scrollBy({ top: height, left: 0, behavior: 'smooth' });
+  window.scrollBy({ top: height * 2, left: 0, behavior: 'smooth' });
 }
