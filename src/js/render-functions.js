@@ -41,6 +41,15 @@ function createGallery(images) {
   lightbox.refresh();
 }
 
+function appendToGallery(images) {
+  if (!Array.isArray(images) || images.length === 0) return;
+  if (!galleryEl) return;
+
+  const markup = buildGalleryMarkup(images);
+  galleryEl.insertAdjacentHTML('beforeend', markup);
+  lightbox.refresh();
+}
+
 function clearGallery() {
   if (!galleryEl) return;
   galleryEl.innerHTML = '';
@@ -69,6 +78,7 @@ function hideLoadMoreButton() {
 
 export {
   createGallery,
+  appendToGallery,
   clearGallery,
   showLoader,
   hideLoader,

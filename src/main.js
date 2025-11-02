@@ -4,6 +4,7 @@ import 'izitoast/dist/css/iziToast.min.css';
 
 import {
   createGallery,
+  appendToGallery,
   clearGallery,
   showLoader,
   hideLoader,
@@ -74,8 +75,6 @@ async function onSearch(ev) {
       hideLoadMoreButton();
       iziToast.info({ title: 'End', message: "That's all for this query." });
     }
-
-    smoothScrollByCardHeight();
   } catch (err) {
     console.error(err);
     iziToast.error({
@@ -112,7 +111,7 @@ async function loadMore() {
       return;
     }
 
-    createGallery(data.hits);
+    appendToGallery(data.hits);
 
     shownImages += data.hits.length;
 
@@ -126,7 +125,7 @@ async function loadMore() {
       showLoadMoreButton();
     }
 
-    smoothScrollByCardHeight();
+    scrollByCardHeight();
   } catch (err) {
     console.error(err);
     iziToast.error({
@@ -140,8 +139,8 @@ async function loadMore() {
   }
 }
 
-function smoothScrollByCardHeight() {
-  const firstCard = document.querySelector('.gallery .photo-item');
+function scrollByCardHeight() {
+  const firstCard = document.querySelector('.gallery li');
   if (!firstCard) return;
   const { height } = firstCard.getBoundingClientRect();
   window.scrollBy({ top: height * 2, left: 0, behavior: 'smooth' });
